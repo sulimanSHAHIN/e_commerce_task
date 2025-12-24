@@ -1,49 +1,34 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_URL = "https://fakestoreapi.com/products";
-
-export const fetchProducts = createAsyncThunk(
-  "products/fetchProducts",
-  async () => {
-    const res = await fetch(API_URL);
+export const fetchProductsByCategory = createAsyncThunk(
+  "products/fetchByCategory",
+  async (category: string) => {
+    const res = await fetch(`https://fakestoreapi.com/products/category/${category}`);
     return await res.json();
   }
 );
 
-interface ProductState {
-  all: any[];
-  visible: number;
-  status: string;
-}
-
-const initialState: ProductState = {
-  all: [],
-  visible: 10,
-  status: "idle",
-};
+export const fetchAllProducts = createAsyncThunk(
+  "products/fetchAll",
+  async () => {
+    const res = await fetch(`https://fakestoreapi.com/products`);
+    return await res.json();
+  }
+);
 
 const productSlice = createSlice({
   name: "products",
-  initialState,
-  reducers: {
-    loadMore(state) {
-      state.visible += 20;
-    },
-  },
+  initialState: { list: [], status: "idle" },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.status = "success";
-        state.all = action.payload;
-      })
-      .addCase(fetchProducts.rejected, (state) => {
-        state.status = "error";
-      });
+      .addCase(fetchProductsByCategory.pending, (state) => { state.status = "loading"; })
+      .addCase(fetchProductsByCategory.fulfilled, (state, action) => { state.status = "success"; state.list = action.payload; })
+      .addCase(fetchProductsByCategory.rejected, (state) => { state.status = "error"; })
+      .addCase(fetchAllProducts.pending, (state) => { state.status = "loading"; })
+      .addCase(fetchAllProducts.fulfilled, (state, action) => { state.status = "success"; state.list = action.payload; })
+      .addCase(fetchAllProducts.rejected, (state) => { state.status = "error"; });
   },
 });
 
-export const { loadMore } = productSlice.actions;
 export default productSlice.reducer;
