@@ -5,22 +5,39 @@ import { useState } from "react";
 interface NavbarProps {
   onFilterChange: (value: string) => void;
   onSearch: (value: string) => void;
+  onTabChange: (tab: string) => void;
 }
 
-export default function Navbar({ onFilterChange, onSearch }: NavbarProps) {
+export default function Navbar({ onFilterChange, onSearch, onTabChange }: NavbarProps) {
   const [searchValue, setSearchValue] = useState("");
+  const [activeTab, setActiveTab] = useState("products"); 
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);     
+    onTabChange(tab);      
+  };
 
   return (
-    <nav className="w-full bg-[#1e2754]  shadow-md sticky top-0 z-50 border-b border-gray-200">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        
-        {/* LEFT SECTION – NAV BUTTONS */}
-        <div className="flex gap-6 font-semibold text-white">
-          <button className="hover:text-orange-600 transition">
+    <nav className="w-full bg-[#1e2754] shadow-md sticky top-0 z-50 border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-white">
+
+        <div className="flex gap-4 font-semibold">
+          <button
+            onClick={() => handleTabClick("products")}
+            className={`px-4 py-2 rounded-lg transition ${
+              activeTab === "products" ? "bg-amber-500 text-[#1e2754]" : "hover:bg-amber-400"
+            }`}
+          >
             All Products
           </button>
-          <button className="hover:text-orange-600 transition">
-            Category
+
+          <button
+            onClick={() => handleTabClick("categories")}
+            className={`px-4 py-2 rounded-lg transition ${
+              activeTab === "categories" ? "bg-amber-500 text-[#1e2754]" : "hover:bg-amber-400"
+            }`}
+          >
+            Categories
           </button>
         </div>
 
@@ -41,7 +58,7 @@ export default function Navbar({ onFilterChange, onSearch }: NavbarProps) {
           <select
             onChange={(e) => onFilterChange(e.target.value)}
             className="px-3 py-2 rounded-lg border border-gray-300 
-                       bg-white shadow-sm cursor-pointer
+                       bg-white text-black shadow-sm cursor-pointer
                        focus:outline-none focus:ring-2 focus:ring-amber-500 
                        transition"
           >

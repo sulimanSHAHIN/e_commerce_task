@@ -1,59 +1,74 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "./redux/categoriesSlice";
+import { fetchProducts, loadMore } from "./redux/productSlice";
 import CategoryCard from "./components/CategoryCard";
+import ProductCard from "./components/ProductCard";
 import Navbar from "./components/Navbar";
 
 export default function HomePage() {
   const dispatch = useDispatch<any>();
-  const { list, status } = useSelector((state: any) => state.categories);
+
+  const [activeTab, setActiveTab] = useState("products");
+
+  const { list: categories, status: catStatus } = useSelector((state: any) => state.categories);
+  const { all: products, visible, status: prodStatus } = useSelector((state: any) => state.products);
 
   useEffect(() => {
     dispatch(fetchCategories());
+    dispatch(fetchProducts());
   }, [dispatch]);
-
-  const handleFilterChange = (filter: string) => {
-    console.log("Filter selected:", filter);
-  };
-
-  const handleSearch = (value: string) => {
-    console.log("Search value:", value);
-  };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* NAVBAR */}
-      <Navbar onFilterChange={handleFilterChange} onSearch={handleSearch} />
+      <Navbar
+        onFilterChange={() => {}}
+        onSearch={() => {}}
+        onTabChange={(t) => setActiveTab(t)}  
+      />
 
-      {/* PAGE CONTAINER */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-blue-600 mb-6 border-l-4 border-amber-500 pl-3">
-          Shop by Category
-        </h1>
+        
+        {activeTab === "categories" && (
+          <>
+            <h1 className="text-3xl font-bold text-blue-600 mb-6">Categories</h1>
 
-        {/* Loading State */}
-        {status === "loading" && (
-          <p className="text-blue-600 font-medium">Loading categories...</p>
+            {catStatus === "loading" && <p>Loading categories...</p>}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {categories.map((cat: string) => (
+                <CategoryCard key={cat} title={cat} />
+              ))}
+            </div>
+          </>
         )}
 
-        {/* Categories Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {list.map((cat: string) => (
-            <div
-              key={cat}
-              className="bg-white shadow-lg rounded-xl p-6 cursor-pointer 
-                         border-l-4 border-blue-600 hover:border-amber-500 
-                         hover:shadow-2xl transform hover:-translate-y-1
-                         transition-all duration-300"
-            >
-              <h2 className="text-lg font-semibold capitalize text-gray-800">
-                {cat}
-              </h2>
+        {activeTab === "products" && (
+          <>
+            <h2 className="text-3xl font-bold text-blue-600 mb-6">All Products</h2>
+
+            {prodStatus === "loading" && <p>Loading products...</p>}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {products.slice(0, visible).map((p: any) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
-          ))}
-        </div>
+
+            {visible < products.length && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => dispatch(loadMore())}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition shadow-lg"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
