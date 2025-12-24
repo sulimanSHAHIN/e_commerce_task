@@ -26,6 +26,11 @@ export default function ProductPage() {
   if (loading) return <p className="p-6 text-center text-gray-500">Loading product...</p>;
   if (!product) return <p className="p-6 text-center text-red-500">Product not found</p>;
 
+  // Generate stars
+  const fullStars = Math.floor(product.rating.rate);
+  const halfStar = product.rating.rate - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <button
@@ -53,7 +58,27 @@ export default function ProductPage() {
 
           <p className="text-gray-700">{product.description}</p>
 
-          <p className="text-gray-500 capitalize">Category: <span className="font-semibold text-gray-800">{product.category}</span></p>
+          <p className="text-gray-500 capitalize">
+            Category: <span className="font-semibold text-gray-800">{product.category}</span>
+          </p>
+
+          {/* Rating */}
+          <div className="flex items-center gap-2 mt-2">
+            {Array(fullStars)
+              .fill(0)
+              .map((_, i) => (
+                <span key={`full-${i}`} className="text-yellow-400 text-lg">&#9733;</span>
+              ))}
+            {halfStar && <span className="text-yellow-400 text-lg">&#9734;</span>}
+            {Array(emptyStars)
+              .fill(0)
+              .map((_, i) => (
+                <span key={`empty-${i}`} className="text-gray-300 text-lg">&#9733;</span>
+              ))}
+            <span className="text-gray-600 ml-2 font-semibold">
+              {product.rating.rate.toFixed(1)}/5 ({product.rating.count} reviews)
+            </span>
+          </div>
 
           <button
             className="mt-4 bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"

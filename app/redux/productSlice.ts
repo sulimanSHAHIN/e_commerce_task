@@ -4,7 +4,8 @@ export const fetchProductsByCategory = createAsyncThunk(
   "products/fetchByCategory",
   async (category: string) => {
     const res = await fetch(`https://fakestoreapi.com/products/category/${category}`);
-    return await res.json();
+    const data = await res.json();
+    return data;
   }
 );
 
@@ -12,22 +13,50 @@ export const fetchAllProducts = createAsyncThunk(
   "products/fetchAll",
   async () => {
     const res = await fetch(`https://fakestoreapi.com/products`);
-    return await res.json();
+    const data = await res.json(); // FIXED — you forgot await
+    return data;
   }
 );
 
 const productSlice = createSlice({
   name: "products",
-  initialState: { list: [], status: "idle" },
+  initialState: {
+    list: [],
+    status: "idle", // idle | loading | succeeded | failed
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProductsByCategory.pending, (state) => { state.status = "loading"; })
-      .addCase(fetchProductsByCategory.fulfilled, (state, action) => { state.status = "success"; state.list = action.payload; })
-      .addCase(fetchProductsByCategory.rejected, (state) => { state.status = "error"; })
-      .addCase(fetchAllProducts.pending, (state) => { state.status = "loading"; })
-      .addCase(fetchAllProducts.fulfilled, (state, action) => { state.status = "success"; state.list = action.payload; })
-      .addCase(fetchAllProducts.rejected, (state) => { state.status = "error"; });
+
+      // ================================
+      // FETCH BY CATEGORY
+      // ================================
+      .addCase(fetchProductsByCategory.pending, (state) => {
+        state.status = "loading";
+        state.list = []; // prevents showing old products
+      })
+      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.list = action.payload;
+      })
+      .addCase(fetchProductsByCategory.rejected, (state) => {
+        state.status = "failed";
+      })
+
+      // ================================
+      // FETCH ALL PRODUCTS
+      // ================================
+      .addCase(fetchAllProducts.pending, (state) => {
+        state.status = "loading";
+        state.list = []; // prevent category products from staying
+      })
+      .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.list = action.payload;
+      })
+      .addCase(fetchAllProducts.rejected, (state) => {
+        state.status = "failed";
+      });
   },
 });
 

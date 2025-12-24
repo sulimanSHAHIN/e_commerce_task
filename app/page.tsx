@@ -10,7 +10,6 @@ import Navbar from "./components/Navbar";
 
 export default function HomePage() {
   const dispatch = useDispatch<any>();
-
   const { list: categories, status: catStatus } = useSelector((state: any) => state.categories);
   const { list: products, status: prodStatus } = useSelector((state: any) => state.products);
 
@@ -18,7 +17,11 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE =10;
+  const ITEMS_PER_PAGE = 10;
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOption, setFilterOption] = useState("none");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -26,32 +29,61 @@ export default function HomePage() {
 
   useEffect(() => {
     setPage(1);
+    setSelectedCategory(null);
+
     if (activeTab === "all") {
-      setSelectedCategory(null);
-      dispatch(fetchAllProducts());
-    } else {
-      setSelectedCategory(null);
       dispatch(fetchAllProducts());
     }
-  }, [activeTab, dispatch]);
+  }, [activeTab]);
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab === "categories" ? "categories" : "all");
+    const newTab = tab === "categories" ? "categories" : "all";
+    setActiveTab(newTab);
+
+    if (newTab === "categories") {
+      setFilterOption("none");
+      setPriceRange([0, 1000]);
+      setSearchQuery("");
+    }
   };
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
-    setPage(1); 
+    setPage(1);
     dispatch(fetchProductsByCategory(category));
   };
 
-  const paginatedProducts = products.slice(0, page * ITEMS_PER_PAGE);
+  const filteredProducts = products
+    .filter((p: any) =>
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.description.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((p: any) => {
+      if (filterOption === "price") {
+        return p.price >= priceRange[0] && p.price <= priceRange[1];
+      }
+      return true;
+    })
+    .sort((a: any, b: any) => {
+  if (filterOption === "rating") {
+    return b.rating.rate - a.rating.rate;
+  }
+  return 0;
+});
+
+
+  const paginatedProducts = filteredProducts.slice(0, page * ITEMS_PER_PAGE);
 
   return (
     <div className="p-6">
       <Navbar
-        onFilterChange={(v) => console.log("Filter:", v)}
-        onSearch={(v) => console.log("Search:", v)}
+        onFilterChange={(option, min, max) => {
+          setFilterOption(option);
+          if (option === "price" && min !== undefined && max !== undefined) {
+            setPriceRange([min, max]);
+          }
+        }}
+        onSearch={(v) => setSearchQuery(v)}
         onTabChange={handleTabChange}
       />
 
@@ -59,12 +91,14 @@ export default function HomePage() {
         <div>
           <h2 className="text-xl font-bold mb-4">All Products</h2>
           {prodStatus === "loading" && <p>Loading products...</p>}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {paginatedProducts.map((p: any) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
-          {products.length > page * ITEMS_PER_PAGE && (
+
+          {filteredProducts.length > page * ITEMS_PER_PAGE && (
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => setPage(page + 1)}
@@ -81,6 +115,7 @@ export default function HomePage() {
         <div>
           <h2 className="text-xl font-bold mb-4">Categories</h2>
           {catStatus === "loading" && <p>Loading categories...</p>}
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {categories.map((cat: string) => (
               <div key={cat} onClick={() => handleCategoryClick(cat)}>
@@ -89,29 +124,24 @@ export default function HomePage() {
             ))}
           </div>
 
-          {selectedCategory && (
-            <div>
-              <h2 className="text-xl font-bold mb-4">
-                Products in "{selectedCategory}"
-              </h2>
-              {prodStatus === "loading" && <p>Loading products...</p>}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {paginatedProducts.map((p: any) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-              {products.length > page * ITEMS_PER_PAGE && (
-                <div className="flex justify-center mt-6">
-                  <button
-                    onClick={() => setPage(page + 1)}
-                    className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition"
-                  >
-                    Load More
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+         {selectedCategory && (
+  <div>
+    <h2 className="text-xl font-bold mb-4">
+      Products in "{selectedCategory}"
+    </h2>
+
+    {prodStatus === "loading" ? (
+      <p>Loading products...</p>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {paginatedProducts.map((p: any) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
         </div>
       )}
     </div>
