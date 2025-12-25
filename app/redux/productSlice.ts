@@ -28,12 +28,9 @@ const productSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // ================================
-      // FETCH BY CATEGORY
-      // ================================
       .addCase(fetchProductsByCategory.pending, (state) => {
         state.status = "loading";
-        state.list = []; // prevents showing old products
+        state.list = []; 
       })
       .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -43,12 +40,9 @@ const productSlice = createSlice({
         state.status = "failed";
       })
 
-      // ================================
-      // FETCH ALL PRODUCTS
-      // ================================
       .addCase(fetchAllProducts.pending, (state) => {
         state.status = "loading";
-        state.list = []; // prevent category products from staying
+        state.list = []; 
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.status = "succeeded";
