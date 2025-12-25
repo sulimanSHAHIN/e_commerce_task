@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../redux/cartSlice";
+import { toggleWishlist } from "../../redux/wishlistSlice";
+import { RootState } from "../../redux/store";
 
 export default function ProductPage() {
   const params = useParams();
@@ -11,10 +13,13 @@ export default function ProductPage() {
   const id = params.id;
 
   const dispatch = useDispatch<any>();
+  const wishlist = useSelector((state: RootState) => state.wishlist.items);
 
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+
+  const isInWishlist = wishlist.some((item) => item.id == id);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -50,6 +55,17 @@ export default function ProductPage() {
     }
   };
 
+  const handleToggleWishlist = () => {
+    dispatch(
+      toggleWishlist({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+      })
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <button
@@ -60,19 +76,14 @@ export default function ProductPage() {
       </button>
 
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6 flex flex-col md:flex-row gap-8">
-        {/* Product Image */}
+        
         <div className="flex justify-center md:w-1/2">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full max-w-md h-auto object-contain rounded-lg"
-          />
+          <img src={product.image}alt={product.title}className="w-full max-w-md h-auto object-contain rounded-lg"/>
         </div>
 
-        {/* Product Info */}
         <div className="flex-1 flex flex-col gap-4">
-          <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
 
+          <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
           <p className="text-2xl text-amber-500 font-bold">${product.price}</p>
 
           <p className="text-gray-700">{product.description}</p>
@@ -81,25 +92,19 @@ export default function ProductPage() {
             Category: <span className="font-semibold text-gray-800">{product.category}</span>
           </p>
 
-          {/* Rating */}
           <div className="flex items-center gap-2 mt-2">
-            {Array(fullStars)
-              .fill(0)
-              .map((_, i) => (
-                <span key={`full-${i}`} className="text-yellow-400 text-lg">&#9733;</span>
-              ))}
+            {Array(fullStars).fill(0).map((_, i) => (
+              <span key={i} className="text-yellow-400 text-lg">&#9733;</span>
+            ))}
             {halfStar && <span className="text-yellow-400 text-lg">&#9734;</span>}
-            {Array(emptyStars)
-              .fill(0)
-              .map((_, i) => (
-                <span key={`empty-${i}`} className="text-gray-300 text-lg">&#9733;</span>
-              ))}
+            {Array(emptyStars).fill(0).map((_, i) => (
+              <span key={i} className="text-gray-300 text-lg">&#9733;</span>
+            ))}
             <span className="text-gray-600 ml-2 font-semibold">
               {product.rating.rate.toFixed(1)}/5 ({product.rating.count} reviews)
             </span>
           </div>
 
-          {/* Quantity selector */}
           <div className="mt-4 flex items-center gap-4">
             <label className="font-semibold">Quantity:</label>
             <select
@@ -108,19 +113,29 @@ export default function ProductPage() {
               className="border rounded px-2 py-1"
             >
               {Array.from({ length: 11 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
+                <option key={i} value={i}>{i}</option>
               ))}
             </select>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            className="mt-4 bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
-          >
-            Add to Cart
-          </button>
+          <div className="flex gap-4 mt-6">
+            
+            <button
+              onClick={handleAddToCart}
+              className="bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
+            >
+              Add to Cart
+            </button>
+
+            <button
+              onClick={handleToggleWishlist}
+              className={`px-6 py-3 rounded-lg transition font-semibold border 
+                ${isInWishlist ? "bg-red-500 text-white" : "text-red-500 border-red-500 hover:bg-red-100"}`}
+            >
+              {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+            </button>
+
+          </div>
         </div>
       </div>
     </div>

@@ -54,11 +54,7 @@ export default function CartPage() {
             key={item.id}
             className="flex items-center gap-4 bg-white p-4 rounded-lg shadow"
           >
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-24 h-24 object-contain rounded"
-            />
+            <img src={item.image} alt={item.title} className="w-24 h-24 object-contain rounded"/>
             <div className="flex-1">
               <h2 className="font-semibold">{item.title}</h2>
               <p className="text-amber-500 font-bold">${item.price}</p>
