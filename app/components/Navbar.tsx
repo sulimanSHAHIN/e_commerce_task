@@ -91,30 +91,44 @@ export default function Navbar({
               placeholder="Search products..."
               className="px-4 py-2 border placeholder-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 shadow-sm transition w-full md:w-56"
             />
+          <select
+            value={filterOption}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFilterOption(val);
 
-            <select
-              value={filterOption}
-              onChange={(e) => {
-                const val = e.target.value;
-                setFilterOption(val);
-
-                if (val === "none") resetPriceRange();
-                if (val === "price") onFilterChange("price", priceMin, priceMax);
-                if (val === "rating-sort") onFilterChange("rating-sort");
-                if (val === "price-sort") onFilterChange("price-sort");
-                if (val === "title-sort") onFilterChange("title-sort");
-                if (val === "min-rating") onFilterChange("min-rating", undefined, undefined, minRating);
-              }}
-              className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-black shadow-sm cursor-pointer
-                         focus:outline-none focus:ring-2 focus:ring-amber-500 transition w-full md:w-auto"
-            >
-              <option value="none">No Filter</option>
-              <option value="price">Price (Range)</option>
-              <option value="rating-sort">Rating (High → Low)</option>
-              <option value="price-sort">Price (Low → High)</option>
-              <option value="title-sort">Title (A → Z)</option>
-              <option value="min-rating">Minimum Rating</option>
-            </select>
+              switch (val) {
+                case "none":
+                  resetPriceRange();
+                  onFilterChange("none"); // <-- important
+                  break;
+                case "price":
+                  onFilterChange("price", priceMin, priceMax);
+                  break;
+                case "rating-sort":
+                  onFilterChange("rating-sort");
+                  break;
+                case "price-sort":
+                  onFilterChange("price-sort");
+                  break;
+                case "title-sort":
+                  onFilterChange("title-sort");
+                  break;
+                case "min-rating":
+                  onFilterChange("min-rating", undefined, undefined, minRating);
+                  break;
+              }
+            }}
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-black shadow-sm cursor-pointer
+                      focus:outline-none focus:ring-2 focus:ring-amber-500 transition w-full md:w-auto"
+          >
+            <option value="none">No Filter</option>
+            <option value="price">Price (Range)</option>
+            <option value="rating-sort">Rating (High → Low)</option>
+            <option value="price-sort">Price (Low → High)</option>
+            <option value="title-sort">Title (A → Z)</option>
+            <option value="min-rating">Minimum Rating</option>
+          </select>
 
             {filterOption === "price" && (
               <div className="flex flex-col w-full md:w-64 text-black">

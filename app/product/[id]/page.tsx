@@ -10,7 +10,8 @@ import { RootState } from "../../redux/store";
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id;
+  const id = Array.isArray(params.id) ? params.id[0] : params.id; // handle string[]
+  const productId = id ? Number(id) : null; // convert to number
 
   const dispatch = useDispatch<any>();
   const wishlist = useSelector((state: RootState) => state.wishlist.items);
@@ -19,19 +20,21 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
-  const isInWishlist = wishlist.some((item) => item.id == id);
+  const isInWishlist = productId !== null && wishlist.some((item) => item.id === productId);
 
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!productId) return;
+
       setLoading(true);
-      const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+      const res = await fetch(`https://fakestoreapi.com/products/${productId}`);
       const data = await res.json();
       setProduct(data);
       setLoading(false);
     };
 
-    if (id) fetchProduct();
-  }, [id]);
+    fetchProduct();
+  }, [productId]);
 
   if (loading) return <p className="p-6 text-center text-gray-500">Loading product...</p>;
   if (!product) return <p className="p-6 text-center text-red-500">Product not found</p>;
@@ -76,18 +79,18 @@ export default function ProductPage() {
       </button>
 
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6 flex flex-col md:flex-row gap-8">
-        
         <div className="flex justify-center md:w-1/2">
-          <img src={product.image}alt={product.title}className="w-full max-w-md h-auto object-contain rounded-lg"/>
+          <img
+            src={product.image}
+            alt={product.title}
+            className="w-full max-w-md h-auto object-contain rounded-lg"
+          />
         </div>
 
         <div className="flex-1 flex flex-col gap-4">
-
           <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
           <p className="text-2xl text-amber-500 font-bold">${product.price}</p>
-
           <p className="text-gray-700">{product.description}</p>
-
           <p className="text-gray-500 capitalize">
             Category: <span className="font-semibold text-gray-800">{product.category}</span>
           </p>
@@ -119,7 +122,6 @@ export default function ProductPage() {
           </div>
 
           <div className="flex gap-4 mt-6">
-            
             <button
               onClick={handleAddToCart}
               className="bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
@@ -134,7 +136,6 @@ export default function ProductPage() {
             >
               {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
             </button>
-
           </div>
         </div>
       </div>

@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
 
 First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+or open this link: https://velvety-eclair-5b0662.netlify.app/
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+npm install @reduxjs/toolkit react-redux
 
-## Learn More
+to download redux
 
-To learn more about Next.js, take a look at the following resources:
+Built an e-commerce with (all product, category and cart)tab 
+Search based on title and description 
+filter based on (minimum rate,price range ,title sorting,price sorting and rate sorting)
+Wishlist page
+Using redux toolkit for API state
+Centralized state for cart, wishlist, categories, and products.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Slices were created for:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+cartSlice: manage cart items, quantities
 
-## Deploy on Vercel
+wishlistSlice: manage wishlist items with toggle logic
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+categoriesSlice: store categories fetched from API
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+productSlice: store all products
+
+- I think it would be better if i add cart svg button like next to wishlist button instead of tab
+-implementing cart management or filter type as sidebar is a good UI idea

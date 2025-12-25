@@ -81,18 +81,28 @@ export default function HomePage() {
   const paginatedProducts = filteredProducts.slice(0, page * ITEMS_PER_PAGE);
 
   return (
-    <div className="px-0">
-      <Navbar
-        onFilterChange={(option, min, max, minRatingValue) => {
-          setFilterOption(option);
-          if (option === "price" && min !== undefined && max !== undefined) setPriceRange([min, max]);
-          if (option === "min-rating" && minRatingValue !== undefined) setMinRating(minRatingValue);
-        }}
-        onSearch={(v) => setSearchQuery(v)}
-        onTabChange={handleTabChange}
-        minPrice={0}
-        maxPrice={1000}
-      />
+            <div className="px-0">
+              <Navbar
+          onFilterChange={(option, min, max, minRatingValue) => {
+            setFilterOption(option);
+            if (option === "price" && min !== undefined && max !== undefined) {
+              setPriceRange([min, max]);
+            }
+            if (option === "min-rating" && minRatingValue !== undefined) {
+              setMinRating(minRatingValue);
+            }
+
+            if (option === "none") {
+              setPriceRange([0, 1000]);
+              setMinRating(1);
+            }
+          }}
+          onSearch={(v) => setSearchQuery(v)}
+          onTabChange={handleTabChange}
+          minPrice={0}
+          maxPrice={1000}
+        />
+
 {activeTab === "all" && (
   <div className="p-6">
     <h2 className="text-xl font-bold mb-4">All Products</h2>
