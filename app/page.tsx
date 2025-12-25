@@ -79,7 +79,7 @@ export default function HomePage() {
   const paginatedProducts = filteredProducts.slice(0, page * ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6">
+    <div className="px-0">
       <Navbar
         onFilterChange={(option, min, max, minRatingValue) => {
           setFilterOption(option);
@@ -93,7 +93,7 @@ export default function HomePage() {
       />
 
       {activeTab === "all" && (
-        <div>
+        <div className="p-6">
           <h2 className="text-xl font-bold mb-4">All Products</h2>
           {prodStatus === "loading" && <p>Loading products...</p>}
 
@@ -117,7 +117,7 @@ export default function HomePage() {
       )}
 
       {activeTab === "categories" && (
-        <div>
+        <div className="p-6">
           <h2 className="text-xl font-bold mb-4">Categories</h2>
           {catStatus === "loading" && <p>Loading categories...</p>}
 
@@ -149,7 +149,7 @@ export default function HomePage() {
       )}
 
       {activeTab === "cart" && (
-        <div>
+        <div className="p-6">
           <h2 className="text-xl font-bold mb-4">Your Cart</h2>
           {cart.length === 0 ? (
             <p>Your cart is empty.</p>
