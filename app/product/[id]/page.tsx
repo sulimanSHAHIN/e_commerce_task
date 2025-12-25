@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../redux/cartSlice";
 
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id; 
+  const id = params.id;
+
+  const dispatch = useDispatch<any>();
 
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,10 +31,24 @@ export default function ProductPage() {
   if (loading) return <p className="p-6 text-center text-gray-500">Loading product...</p>;
   if (!product) return <p className="p-6 text-center text-red-500">Product not found</p>;
 
-  // Generate stars
   const fullStars = Math.floor(product.rating.rate);
   const halfStar = product.rating.rate - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+  const handleAddToCart = () => {
+    if (quantity > 0) {
+      dispatch(
+        addToCart({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          image: product.image,
+          quantity,
+        })
+      );
+      alert(`${product.title} added to cart!`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -80,7 +99,24 @@ export default function ProductPage() {
             </span>
           </div>
 
+          {/* Quantity selector */}
+          <div className="mt-4 flex items-center gap-4">
+            <label className="font-semibold">Quantity:</label>
+            <select
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="border rounded px-2 py-1"
+            >
+              {Array.from({ length: 11 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
+            onClick={handleAddToCart}
             className="mt-4 bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
           >
             Add to Cart
